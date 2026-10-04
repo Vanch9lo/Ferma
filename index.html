@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Ферма: Наследие предков</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: linear-gradient(180deg, #87CEEB 0%, #7CB342 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+#app { width: 100vw; height: 100vh; background: #FFF8E7; position: relative; }
+
+.screen { display: none; width: 100%; height: 100%; position: absolute; }
+.screen.on { display: flex; flex-direction: column; }
+
+/* MENU */
+.menu { background: linear-gradient(180deg, #4A90A4 0%, #7CB342 30%, #558B2F 100%); justify-content: center; align-items: center; }
+.menu h1 { font-size: 50px; color: #FFD700; text-shadow: 3px 3px #5D3A1A; margin-bottom: 10px; }
+.menu h2 { font-size: 20px; color: white; margin-bottom: 30px; }
+.btn { padding: 15px 50px; font-size: 20px; border: none; border-radius: 15px; cursor: pointer; background: #FFD700; color: #5D3A1A; font-weight: bold; }
+
+/* CUTSCENE */
+.cut { background: #1a1a2e; justify-content: center; align-items: center; padding: 20px; }
+.cut .ci { font-size: 80px; margin-bottom: 20px; }
+.cut .cs { color: #FFD700; font-size: 24px; margin-bottom: 15px; }
+.cut .ct { color: white; font-size: 18px; background: rgba(0,0,0,0.8); padding: 20px; border-radius: 15px; max-width: 500px; text-align: center; }
+
+/* FARM */
+.top { background: #5D4037; color: white; padding: 10px 20px; display: flex; justify-content: space-between; }
+.top .stats span { margin-left: 15px; }
+
+.mid { flex: 1; display: flex; background: linear-gradient(180deg, #87CEEB 50%, #7CB342 50%); padding: 20px; gap: 20px; }
+
+.nav-buttons { display: flex; flex-direction: column; gap: 15px; }
+.nav-btn { width: 80px; height: 80px; font-size: 40px; background: rgba(0,0,0,0.3); border-radius: 15px; border: none; cursor: pointer; }
+
+.center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.garden-btn { font-size: 80px; background: rgba(0,0,0,0.3); border-radius: 20px; border: none; cursor: pointer; padding: 30px; }
+
+.animals { background: white; border-radius: 10px; padding: 10px; margin-top: 10px; }
+.animals .ani { display: inline-block; font-size: 30px; margin: 5px; cursor: pointer; }
+
+.bot { background: #5D4037; padding: 10px; display: flex; justify-content: center; gap: 10px; }
+.bot button { padding: 10px 20px; font-size: 14px; background: #FFA726; border: none; border-radius: 8px; color: white; cursor: pointer; }
+
+/* PLOTS */
+.plots-screen { background: linear-gradient(180deg, #87CEEB 0%, #7CB342 100%); justify-content: center; align-items: center; }
+.plots-container { background: rgba(0,0,0,0.3); border-radius: 20px; padding: 20px; width: 90%; max-width: 400px; }
+.plots-container h2 { color: white; text-align: center; margin-bottom: 15px; }
+.plots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.plot { background: #8B4513; border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; min-height: 60px; }
+.plot.empty { background: #A0522D; }
+.plot .ic { font-size: 30px; }
+.plot .tx { color: white; font-size: 10px; display: block; margin-top: 5px; }
+.plot.ready { background: #4CAF50; }
+
+/* FOREST */
+.forest { background: #2E7D32; justify-content: center; align-items: center; }
+.forest-container { background: #4CAF50; border-radius: 20px; padding: 20px; width: 90%; max-width: 400px; }
+.forest-container h2 { color: white; text-align: center; margin-bottom: 15px; }
+.resources { display: flex; justify-content: center; gap: 30px; margin-bottom: 15px; }
+.resources span { color: white; font-size: 20px; }
+.trees-area, .stones-area { background: rgba(0,0,0,0.2); border-radius: 10px; padding: 10px; margin-bottom: 10px; }
+.trees-area h3, .stones-area h3 { color: white; text-align: center; margin-bottom: 10px; }
+.trees, .stones { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.tree, .stone { width: 50px; height: 50px; background: #8B4513; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 25px; cursor: pointer; }
+.forest-back { display: block; margin: 15px auto 0; padding: 10px 25px; background: #FFA726; border: none; border-radius: 8px; color: white; cursor: pointer; }
+
+/* HOUSE */
+.house-map { background: #1a1a2e; justify-content: center; align-items: center; }
+.house-container { background: #2c1810; border: 5px solid #8B4513; border-radius: 20px; padding: 20px; width: 90%; max-width: 500px; }
+.house-container h2 { color: #FFD700; text-align: center; margin-bottom: 15px; }
+.rooms { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.room { background: #DEB887; border: 3px solid #8B4513; border-radius: 10px; padding: 15px; text-align: center; cursor: pointer; }
+.room .ric { font-size: 35px; display: block; }
+.room .rname { color: #5D3A1A; font-size: 14px; font-weight: bold; }
+.room-back { display: block; margin: 15px auto 0; padding: 10px 25px; background: #FFA726; border: none; border-radius: 8px; color: white; cursor: pointer; }
+
+/* ROOM */
+.room-screen { background: #0a0a0a; justify-content: center; align-items: center; }
+.room-view { background: #FFF8DC; border-radius: 20px; width: 95%; max-width: 800px; height: 90%; display: flex; flex-direction: column; overflow: hidden; }
+.room-bg { flex: 1; position: relative; }
+.room-bg.bedroom { background: linear-gradient(180deg, #E8D5B7 0%, #D4C4A8 100%); }
+.room-bg.kitchen { background: linear-gradient(180deg, #FFF8E7 0%, #F5E6D3 100%); }
+.room-bg.living { background: linear-gradient(180deg, #d4a574 0%, #c4956a 100%); }
+.room-bg.bathroom { background: linear-gradient(180deg, #e0f7fa 0%, #b2ebf2 100%); }
+.room-floor { position: absolute; bottom: 0; left: 0; right: 0; height: 25%; background: #6d4c41; }
+.room-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: #4a3728; color: #FFD700; }
+.room-header button { padding: 8px 20px; background: #FFA726; border: none; border-radius: 5px; color: white; cursor: pointer; }
+.room-grid { position: absolute; bottom: 80px; left: 20px; right: 20px; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 5px; }
+.room-slot { background: rgba(255,255,255,0.5); border: 2px dashed #8B4513; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 25px; cursor: pointer; }
+.room-slot:hover { background: white; }
+.room-slot.filled { background: white; border-style: solid; }
+.furn-palette { position: absolute; bottom: 0; left: 0; right: 0; background: #3e2723; padding: 10px; display: flex; align-items: center; gap: 10px; }
+.furn-palette span { color: #FFD700; margin-right: 10px; }
+.furn-item { width: 40px; height: 40px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; border: 2px solid transparent; }
+.furn-item:hover { border-color: #FFD700; }
+.furn-item.selected { border-color: red; }
+
+/* SHOP / INV */
+.shop, .inv { background: #5D4037; padding: 20px; }
+.shop h2, .inv h2 { color: #FFD700; text-align: center; margin-bottom: 15px; }
+.items-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.item { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; text-align: center; color: white; cursor: pointer; }
+.item .ic { font-size: 30px; }
+.item .na { font-size: 12px; margin-top: 5px; }
+.item .co { color: #FFD700; font-weight: bold; margin-top: 5px; }
+.back-btn { display: block; margin: 15px auto 0; padding: 10px 25px; background: #FFA726; border: none; border-radius: 8px; color: white; cursor: pointer; }
+
+/* TOAST */
+.toast { position: fixed; top: 50px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: white; padding: 10px 20px; border-radius: 10px; z-index: 1000; border: 2px solid #FFD700; }
+
+/* DAY */
+.day { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 500; }
+.day.on { display: flex; }
+.day span { color: white; font-size: 30px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- MENU -->
+<div class="screen menu on" id="menu">
+<h1>🏡 Ферма</h1>
+<h2>Наследие предков</h2>
+<button class="btn" onclick="newGame()">Новая игра</button>
+</div>
+
+<!-- CUTSCENES -->
+<div class="screen cut" id="cut1">
+<div class="ci">✉️</div>
+<div class="cs">Письмо от дедушки</div>
+<div class="ct">Дорогой внук! Я пишу тебе из прошлого. Моя жизнь подходит к концу, но я хочу оставить тебе нашу семейную ферму...</div>
+<button class="btn" onclick="nextCut()">Далее</button>
+</div>
+
+<div class="screen cut" id="cut2">
+<div class="ci">🏚️</div>
+<div class="cs">Заброшенная ферма</div>
+<div class="ct">Наша ферма ждёт тебя. Она заброшена много лет, но в её земле живёт сила моей любви и труда.</div>
+<button class="btn" onclick="nextCut()">Далее</button>
+</div>
+
+<div class="screen cut" id="cut3">
+<div class="ci">🌾</div>
+<div class="cs">Новая жизнь</div>
+<div class="ct">Ты создашь свою историю на этой земле. Выращивай урожай, разводи животных, обустраивай дом!</div>
+<button class="btn" onclick="nextCut()">Далее</button>
+</div>
+
+<div class="screen cut" id="cut4">
+<div class="ci">👴</div>
+<div class="cs">Прощание</div>
+<div class="ct">Прощай, мой дорогой! Пусть удача сопутствует тебе. С любовью, твой дедушка.</div>
+<button class="btn" onclick="startGame()">Начать играть</button>
+</div>
+
+<!-- FARM -->
+<div class="screen farm" id="farm">
+<div class="top">
+<div>🏡 Ферма</div>
+<div class="stats">
+<span>💰<span id="mo">100</span></span>
+<span>🪵<span id="wood">0</span></span>
+<span>🪨<span id="stone">0</span></span>
+<span>📅<span id="da">1</span></span>
+<span id="se">🌸 Весна</span>
+</div>
+</div>
+
+<div class="mid">
+<div class="nav-buttons">
+<button class="nav-btn" onclick="showHouse()">🏠</button>
+<button class="nav-btn" onclick="showForest()">🌲</button>
+</div>
+
+<div class="center">
+<button class="garden-btn" onclick="showPlots()">🌱</button>
+<div class="animals">
+<h4>Животные</h4>
+<div class="ani" id="an"></div>
+</div>
+</div>
+</div>
+
+<div class="bot">
+<button onclick="shShop()">Магазин</button>
+<button onclick="shInv()">Инвентарь</button>
+<button onclick="nextDay()">Спать</button>
+</div>
+</div>
+
+<!-- PLOTS -->
+<div class="screen plots-screen" id="plots">
+<div class="plots-container">
+<h2>🌱 Грядки</h2>
+<div class="plots-grid" id="pl"></div>
+<button class="forest-back" onclick="backFarm()">Назад</button>
+</div>
+</div>
+
+<!-- FOREST -->
+<div class="screen forest" id="forest">
+<div class="forest-container">
+<h2>🌲 Лес</h2>
+<div class="resources">
+<span>🪵 <span id="woodCount">0</span></span>
+<span>🪨 <span id="stoneCount">0</span></span>
+</div>
+<div class="trees-area">
+<h3>Деревья</h3>
+<div class="trees" id="treeArea"></div>
+</div>
+<div class="stones-area">
+<h3>Камни</h3>
+<div class="stones" id="stoneArea"></div>
+</div>
+<button class="forest-back" onclick="backFarm()">Назад</button>
+</div>
+</div>
+
+<!-- HOUSE MAP -->
+<div class="screen house-map" id="houseMap">
+<div class="house-container">
+<h2>🏠 Дом</h2>
+<div class="rooms">
+<div class="room" onclick="enterRoom(0)"><span class="ric">🛏️</span><span class="rname">Спальня</span></div>
+<div class="room" onclick="enterRoom(1)"><span class="ric">🍳</span><span class="rname">Кухня</span></div>
+<div class="room" onclick="enterRoom(2)"><span class="ric">🛋️</span><span class="rname">Гостиная</span></div>
+<div class="room" onclick="enterRoom(3)"><span class="ric">🚿</span><span class="rname">Ванная</span></div>
+</div>
+<button class="room-back" onclick="backFarm()">Назад</button>
+</div>
+</div>
+
+<!-- ROOM -->
+<div class="screen room-screen" id="room">
+<div class="room-view">
+<div class="room-bg bedroom" id="roomBg">
+<div class="room-floor"></div>
+<div class="room-header">
+<h2 id="roomTitle">Комната</h2>
+<button onclick="showHouse()">Назад</button>
+</div>
+<div class="room-grid" id="roomGrid"></div>
+<div class="furn-palette">
+<span>Мебель:</span>
+<div id="furnPalette"></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- SHOP -->
+<div class="screen shop" id="shop">
+<h2>🛒 Магазин</h2>
+<div class="items-grid" id="sg"></div>
+<button class="back-btn" onclick="backFarm()">Назад</button>
+</div>
+
+<!-- INV -->
+<div class="screen inv" id="inv">
+<h2>🎒 Инвентарь</h2>
+<div class="items-grid" id="ig"></div>
+<button class="back-btn" onclick="backFarm()">Назад</button>
+</div>
+
+<div class="day" id="day"><span>Новый день</span></div>
+</div>
+
+<script>
+var roomNames = ['Спальня', 'Кухня', 'Гостиная', 'Ванная'];
+var roomIcons = ['🛏️', '🍳', '🛋️', '🚿'];
+var roomClasses = ['bedroom', 'kitchen', 'living', 'bathroom'];
+
+var furnitureList = [
+{n:'Кровать',p:50,w:5,s:0,i:'🛏️'},{n:'Стул',p:20,w:3,s:0,i:'🪑'},{n:'Стол',p:30,w:5,s:2,i:'🪵'},{n:'Лампа',p:25,w:2,s:1,i:'💡'},{n:'ТВ',p:100,w:2,s:5,i:'📺'},{n:'Холод',p:80,w:1,s:8,i:'🧊'},{n:'Печь',p:60,w:4,s:4,i:'🍳'},{n:'Диван',p:70,w:6,s:2,i:'🛋️'},{n:'Ванна',p:90,w:0,s:15,i:'🛁'},{n:'Туалет',p:45,w:0,s:8,i:'🚽'},{n:'Душ',p:55,w:1,s:6,i:'🚿'},{n:'Растение',p:15,w:2,s:0,i:'🪴'},{n:'Мишка',p:35,w:2,s:0,i:'🧸'},{n:'Кресло',p:40,w:4,s:1,i:'🪑'},{n:'Комод',p:50,w:6,s:3,i:'🗄️'},{n:'Камин',p:100,w:8,s:10,i:'🔥'}
+];
+
+function getSeasonMod(){
+if(st.se=='winter') return 2.5;
+if(st.se=='autumn') return 1.5;
+return 1;
+}
+
+function getPriceMod(){
+if(st.se=='winter') return 2;
+if(st.se=='autumn') return 1.5;
+return 1;
+}
+
+var data = {
+crops: { 
+carrot:{n:'Морковь',t:3,s:15,p:30,i:'🥕'}, 
+tomato:{n:'Помидор',t:4,s:25,p:40,i:'🍅'}, 
+corn:{n:'Кукуруза',t:5,s:35,p:50,i:'🌽'}, 
+wheat:{n:'Пшеница',t:3,s:20,p:35,i:'🌾'}, 
+potato:{n:'Картофель',t:4,s:18,p:28,i:'🥔'}, 
+pumpkin:{n:'Тыква',t:6,s:40,p:60,i:'🎃'}, 
+strawberry:{n:'Клубника',t:3,s:30,p:55,i:'🍓'}, 
+watermelon:{n:'Арбуз',t:5,s:45,p:65,i:'🍉'}, 
+sunflower:{n:'Подсолнух',t:4,s:28,p:45,i:'🌻'}, 
+eggplant:{n:'Баклажан',t:5,s:32,p:48,i:'🍆'} 
+},
+anim: { 
+cow:{n:'Корова',p:500,pr:'milk',i:'🐄'}, 
+chicken:{n:'Курица',p:150,pr:'eggs',i:'🐔'}, 
+sheep:{n:'Овца',p:400,pr:'wool',i:'🐑'} 
+}
+};
+
+var st = { m:100, d:1, se:'spring', pl:[], se2:{carrot:3,tomato:2,corn:0,wheat:0,potato:0,pumpkin:0,strawberry:0,watermelon:0,sunflower:0,eggplant:0}, cr:{carrot:0,tomato:0,corn:0,wheat:0,potato:0,pumpkin:0,strawberry:0,watermelon:0,sunflower:0,eggplant:0}, pr:{milk:0,eggs:0,wool:0}, an:[], house:0, rooms:[[],[],[],[]], currentRoom:0, wood:0, stone:0, trees:10, stones:8, collected_today:[] };
+var season = { spring:'🌸 Весна', summer:'☀️ Лето', autumn:'🍂 Осень', winter:'❄️ Зима' };
+var cutScene = 1;
+var selectedFurniture = null;
+
+function newGame(){
+st = { m:100, d:1, se:'spring', pl:[], se2:{carrot:3,tomato:2,corn:0,wheat:0,potato:0,pumpkin:0,strawberry:0,watermelon:0,sunflower:0,eggplant:0}, cr:{carrot:0,tomato:0,corn:0,wheat:0,potato:0,pumpkin:0,strawberry:0,watermelon:0,sunflower:0,eggplant:0}, pr:{milk:0,eggs:0,wool:0}, an:[], house:0, rooms:[[],[],[],[]], currentRoom:0, wood:0, stone:0, trees:10, stones:8, collected_today:[] };
+for(var i=0;i<9;i++) st.pl.push({c:null,g:0,r:false});
+showScreen('cut1');
+cutScene = 1;
+}
+
+function showScreen(id){
+document.querySelectorAll('.screen').forEach(function(x){x.classList.remove('on');});
+document.getElementById(id).classList.add('on');
+}
+
+function nextCut(){
+cutScene++;
+if(cutScene>4){startGame();}else{showScreen('cut'+cutScene);}
+}
+
+function startGame(){
+showFarm();
+}
+
+function showFarm(){
+showScreen('farm');
+document.getElementById('mo').textContent=st.m;
+document.getElementById('wood').textContent=st.wood;
+document.getElementById('stone').textContent=st.stone;
+document.getElementById('da').textContent=st.d;
+document.getElementById('se').textContent=season[st.se];
+renAn();
+}
+
+function renAn(){
+var a=document.getElementById('an'); a.innerHTML='';
+if(st.an.length===0){ a.innerHTML='нет'; return; }
+st.an.forEach(function(an,i){
+var d=document.createElement('span');
+d.className='ani';
+d.textContent=data.anim[an.t].i;
+d.onclick=function(){ colAn(i); };
+a.appendChild(d);
+});
+}
+
+function colAn(i){
+if(st.collected_today.includes(i)){ msg('Уже!'); return; }
+var an=st.an[i];
+st.pr[data.anim[an.t].pr]++;
+st.collected_today.push(i);
+msg('+' + data.anim[an.t].i);
+renAn();
+}
+
+function showPlots(){
+showScreen('plots');
+renPlot();
+}
+
+function renPlot(){
+var p=document.getElementById('pl'); p.innerHTML='';
+st.pl.forEach(function(pl,i){
+var d=document.createElement('div');
+d.className='plot'+(pl.c?'':' empty')+(pl.r?' ready':'');
+if(pl.c){
+var cr=data.crops[pl.c];
+var mod=getSeasonMod();
+d.innerHTML='<span class="ic">'+cr.i+'</span><span class="tx">'+(pl.r?'Готов':cr.n)+'</span>'+(pl.r?'':'<div style="width:50%;height:5px;background:rgba(0,0,0,0.3);margin:5px auto 0;border-radius:3px;"><div style="height:100%;background:#4CAF50;width:'+(pl.g/(cr.t*mod)*100)+'%;border-radius:3px;"></div></div>');
+}else{
+d.innerHTML='<span class="ic">🌱</span><span class="tx">Садить</span>';
+}
+d.onclick=function(){ clickPlot(i); };
+p.appendChild(d);
+});
+}
+
+function clickPlot(i){
+var pl=st.pl[i];
+if(!pl.c){
+var ks=Object.keys(st.se2).filter(function(k){return st.se2[k]>0;});
+if(ks.length==0){ msg('Нет семян!'); return; }
+st.se2[ks[0]]--;
+st.pl[i]={c:ks[0],g:0,r:false};
+msg('Посажено');
+}else if(pl.r){
+var cr=data.crops[pl.c];
+st.cr[pl.c]++;
+st.pl[i]={c:null,g:0,r:false};
+msg('+' + cr.n + ' ' + cr.i);
+}
+renPlot();
+}
+
+function showForest(){
+showScreen('forest');
+updateForest();
+}
+
+function updateForest(){
+document.getElementById('woodCount').textContent=st.wood;
+document.getElementById('stoneCount').textContent=st.stone;
+var ta=document.getElementById('treeArea'); ta.innerHTML='';
+for(var i=0;i<st.trees;i++){
+var t=document.createElement('div');
+t.className='tree';
+t.textContent='🌲';
+t.onclick=function(){ st.wood+=Math.floor(Math.random()*3)+2; st.trees--; msg('+Дерево'); updateForest(); };
+ta.appendChild(t);
+}
+var sa=document.getElementById('stoneArea'); sa.innerHTML='';
+for(var i=0;i<st.stones;i++){
+var s=document.createElement('div');
+s.className='stone';
+s.textContent='🪨';
+s.onclick=function(){ st.stone+=Math.floor(Math.random()*2)+1; st.stones--; msg('+Камень'); updateForest(); };
+sa.appendChild(s);
+}
+}
+
+function showHouse(){
+showScreen('houseMap');
+}
+
+function enterRoom(roomIndex){
+st.currentRoom=roomIndex;
+showScreen('room');
+document.getElementById('roomTitle').textContent=roomIcons[roomIndex]+' '+roomNames[roomIndex];
+document.getElementById('roomBg').className='room-bg '+roomClasses[roomIndex];
+selectedFurniture=null;
+renderRoomGrid();
+renderFurniturePalette();
+}
+
+function renderRoomGrid(){
+var grid=document.getElementById('roomGrid'); grid.innerHTML='';
+for(var i=0;i<24;i++){
+var slot=document.createElement('div');
+slot.className='room-slot'+(st.rooms[st.currentRoom][i]?' filled':'');
+if(st.rooms[st.currentRoom][i]) slot.textContent=st.rooms[st.currentRoom][i];
+slot.onclick=function(idx){
+return function(){
+if(selectedFurniture!==null){
+var f=furnitureList[selectedFurniture];
+if(st.wood>=f.w && st.stone>=f.s){
+st.wood-=f.w; st.stone-=f.s;
+st.rooms[st.currentRoom][idx]=f.i;
+msg(f.n);
+renderRoomGrid();
+showHouse();
+}else{msg('Нужны ресурсы!');}
+selectedFurniture=null;
+}else if(st.rooms[st.currentRoom][idx]){
+st.rooms[st.currentRoom][idx]=null;
+msg('Убрано');
+renderRoomGrid();
+}
+};
+}(i);
+grid.appendChild(slot);
+}
+}
+
+function renderFurniturePalette(){
+var pal=document.getElementById('furnPalette'); pal.innerHTML='';
+furnitureList.forEach(function(f,i){
+var item=document.createElement('div');
+item.className='furn-item'+(selectedFurniture===i?' selected':'');
+item.textContent=f.i;
+item.onclick=function(){ selectedFurniture=(selectedFurniture===i?null:i); renderFurniturePalette(); };
+pal.appendChild(item);
+});
+}
+
+function shShop(){
+showScreen('shop');
+var g=document.getElementById('sg'); g.innerHTML='';
+var mod=getPriceMod();
+Object.keys(data.crops).forEach(function(k){
+var d=document.createElement('div');
+d.className='item';
+var price=Math.floor(data.crops[k].p*mod);
+d.onclick=function(){ if(st.m>=price){st.m-=price;st.se2[k]++;msg('Куплено');}else{msg('Нет денег');} };
+d.innerHTML='<div class="ic">'+data.crops[k].i+'</div><div class="na">'+data.crops[k].n+'</div><div class="co">'+price+'</div>';
+g.appendChild(d);
+});
+Object.keys(data.anim).forEach(function(k){
+var x=document.createElement('div');
+x.className='item';
+var price=Math.floor(data.anim[k].p*mod);
+x.onclick=function(){ if(st.m>=price){st.m-=price;st.an.push({t:k});msg('Куплено');renAn();}else{msg('Нет денег');} };
+x.innerHTML='<div class="ic">'+data.anim[k].i+'</div><div class="na">'+data.anim[k].n+'</div><div class="co">'+price+'</div>';
+g.appendChild(x);
+});
+}
+
+function shInv(){
+showScreen('inv');
+var g=document.getElementById('ig'); g.innerHTML='';
+Object.keys(st.se2).forEach(function(k){
+if(st.se2[k]>0){
+var d=document.createElement('div');
+d.className='item';
+d.innerHTML='<div class="ic">'+data.crops[k].i+'</div><div class="na">'+data.crops[k].n+'</div><div class="co">x'+st.se2[k]+'</div>';
+g.appendChild(d);
+}
+});
+Object.keys(st.cr).forEach(function(k){
+if(st.cr[k]>0){
+var d=document.createElement('div');
+d.className='item';
+d.onclick=function(){ st.cr[k]--;st.m+=data.crops[k].s;msg('+' + data.crops[k].s);shInv(); };
+d.innerHTML='<div class="ic">'+data.crops[k].i+'</div><div class="na">'+data.crops[k].n+'</div><div class="co">x'+st.cr[k]+'</div>';
+g.appendChild(d);
+}
+});
+Object.keys(st.pr).forEach(function(k){
+if(st.pr[k]>0){
+var nm={milk:'Молоко',eggs:'Яйца',wool:'Шерсть'};
+var prc={milk:25,eggs:12,wool:35};
+var prd={milk:'🥛',eggs:'🥚',wool:'🧶'};
+var d=document.createElement('div');
+d.className='item';
+d.onclick=function(){ st.pr[k]--;st.m+=prc[k];msg('+' + prc[k]);shInv(); };
+d.innerHTML='<div class="ic">'+prd[k]+'</div><div class="na">'+nm[k]+'</div><div class="co">x'+st.pr[k]+'</div>';
+g.appendChild(d);
+}
+});
+}
+
+function backFarm(){
+showFarm();
+}
+
+function nextDay(){
+document.getElementById('day').classList.add('on');
+setTimeout(function(){
+st.d++;
+st.trees=10; st.stones=8;
+st.collected_today=[];
+if(st.d%30===0){
+var ss=['spring','summer','autumn','winter']; st.se=ss[(ss.indexOf(st.se)+1)%4];
+}
+var mod=getSeasonMod();
+st.pl.forEach(function(pl){ if(pl.c&&!pl.r){pl.g++; if(pl.g>=data.crops[pl.c].t*mod)pl.r=true;} });
+document.getElementById('day').classList.remove('on');
+msg('День '+st.d);
+document.getElementById('da').textContent=st.d;
+document.getElementById('mo').textContent=st.m;
+document.getElementById('se').textContent=season[st.se];
+},1500);
+}
+
+function msg(t){
+var x=document.querySelector('.toast');
+if(x)x.remove();
+var d=document.createElement('div');
+d.className='toast';
+d.textContent=t;
+document.getElementById('app').appendChild(d);
+setTimeout(function(){ d.remove(); },2000);
+}
+
+document.addEventListener('keydown',function(e){
+if(e.key==='Enter' && document.querySelector('.cut.on')) nextCut();
+});
+</script>
+</body>
+</html>
